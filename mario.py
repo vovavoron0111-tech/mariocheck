@@ -38,13 +38,6 @@ class Player(pygame.sprite.Sprite):
         self.speed_y = 0
     def update(self):
         keys = pygame.key.get_pressed()
-        if self.rect.bottom <= ground_y:
-            #self.speed_y += gravity
-            self.rect.y += self.speed_y
-        else:
-            self.speed_y = 0
-            self.rect.bottom = ground_y
-
         self.rect.x += self.vel_x
         if self.rect.x <= 0:
             self.rect.x = 0
@@ -57,27 +50,39 @@ class Player(pygame.sprite.Sprite):
             self.vel_x -= 0.5
             if self.vel_x <= -5:
                 self.vel_x = -5
-        if keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_RIGHT]:
             self.vel_x += 0.5
             if self.vel_x >= 5:
                 self.vel_x = 5
-
-
         else:
-            self.speed_y += gravity
-            hits = pygame.sprite.spritecollide(self, platforms, False)
-            for platform in hits:
-                if self.speed_y > 0:
-                    self.rect.bottom = platform.rect.top
-                    self.speed_y = 0
-                    self.on_ground = True
+            self.vel_x *= 0.97
+        hits = pygame.sprite.spritecollide(self, platforms, False)
+        for platform in hits:
+            if self.vel_x > 0:
+                self.rect.right = platform.rect.left
+                self.vel_x = 0
 
-                elif self.speed_y < 0:
-                    self.rect.top = platform.rect.bottom
-                    self.speed_y = 0
-            if keys[pygame.K_SPACE] and self.on_ground == True:
-                self.speed_y = - 10
+            elif self.vel_x < 0:
+                self.rect.left = platform.rect.right
+                self.vel_x = 0
 
+        #x-movement end
+        #y-movement beginning
+
+        self.speed_y += gravity
+        hits = pygame.sprite.spritecollide(self, platforms, False)
+        for platform in hits:
+            if self.speed_y > 0:
+                self.rect.bottom = platform.rect.top
+                self.speed_y = 0
+                self.on_ground = True
+
+            elif self.speed_y < 0:
+                self.rect.top = platform.rect.bottom
+                self.speed_y = 0
+        if keys[pygame.K_SPACE] and self.on_ground == True:
+            self.speed_y = - 10
+        self.rect.y += self.speed_y
         self.on_ground = False
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
@@ -88,7 +93,7 @@ class Platform(pygame.sprite.Sprite):
         self.rect.topleft = (x, y)
     def update(self):
         pass
-platform1 = Platform(200, 370, 150, 20)
+platform1 = Platform(200, 400, 150, 20)
 platform2 = Platform(150, 100, 150, 20)
 ground = Platform(0, 550, 800, 50)
 player = Player()
