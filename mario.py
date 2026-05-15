@@ -2,12 +2,14 @@ import platform
 
 import pygame
 import random
-
+score = 0
+timer = 0
 WIDTH = 800
 HEIGHT = 600
 FPS = 60
 pygame.init()
 pygame.mixer.init()
+font = pygame.font.SysFont('arial', 36)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("mygame")
 clock = pygame.time.Clock()
@@ -23,8 +25,19 @@ lemonsomething = (255,250,205)
 yellow = (255,255,0)
 cyan = (0,255,255)
 ground_y = HEIGHT -50
+TILE_SIZE = 41
+gravity = 0.3
 
-gravity = 0.5
+ground_img = pygame.image.load('Tiles/ground.png').convert_alpha()
+platform_img = pygame.image.load('Tiles/platform.png').convert_alpha()
+player_img = pygame.image.load('Tiles/player.png').convert_alpha()
+ground1_img = pygame.image.load('Tiles/ground1,2,3layers.png').convert_alpha()
+
+ground_img = pygame.transform.scale(ground_img, (TILE_SIZE, TILE_SIZE))
+platform_img = pygame.transform.scale(platform_img, (TILE_SIZE, TILE_SIZE))
+player_img = pygame.transform.scale(player_img, (40, 50))
+ground1_img = pygame.transform.scale(ground1_img, (TILE_SIZE, TILE_SIZE))
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -70,6 +83,8 @@ class Player(pygame.sprite.Sprite):
         #y-movement beginning
 
         self.speed_y += gravity
+        self.rect.y += self.speed_y
+
         hits = pygame.sprite.spritecollide(self, platforms, False)
         for platform in hits:
             if self.speed_y > 0:
@@ -82,29 +97,99 @@ class Player(pygame.sprite.Sprite):
                 self.speed_y = 0
         if keys[pygame.K_SPACE] and self.on_ground == True:
             self.speed_y = - 10
-        self.rect.y += self.speed_y
         self.on_ground = False
 class Platform(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, image):
         super().__init__()
-        self.image = pygame.Surface((width, height))
-        self.image.fill(green)
+        self.image = image
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
     def update(self):
         pass
-platform1 = Platform(200, 400, 150, 20)
-platform2 = Platform(150, 100, 150, 20)
-ground = Platform(0, 550, 800, 50)
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, x, y, radius):
+        super().__init__()
+        self.image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+        pygame.draw.circle(self.image, yellow, (radius, radius), radius)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        if radius == 24:
+            self.price = 3
+        elif radius == 12:
+            self.price = 2
+        elif radius == 6:
+            self.price = 1
+
+    def update(self):
+        pass
+
+
+
+coin1 = Coin(250, 370, 6)
+coin2 = Coin(560, 270, 12)
+coin3 = Coin(150, 220, 12)
+coin4 = Coin(700, 500, 24)
+coin5 = Coin(150, 370, 6)
+coin6 = Coin(730, 370, 6)
+coin7 = Coin(350, 370, 24)
+
 player = Player()
+
 platforms = pygame.sprite.Group()
-platforms.add(platform1)
-platforms.add(ground)
-platforms.add(platform2)
 all_sprites = pygame.sprite.Group()
+coins = pygame.sprite.Group()
+
+
+
 all_sprites.add(player)
 all_sprites.add(platforms)
-all_sprites.add(ground)
+
+all_sprites.add(coin1, coin2, coin3, coin4, coin5, coin6, coin7)
+coins.add(coin1, coin2, coin3, coin4, coin5, coin6, coin7)
+for x in range(0, WIDTH, TILE_SIZE):
+    ground = Platform(x, HEIGHT - 82 - TILE_SIZE, ground_img)
+
+    all_sprites.add(ground)
+    platforms.add(ground)
+
+for x in range(0, WIDTH, TILE_SIZE):
+    ground1 = Platform(x, HEIGHT - 41 - TILE_SIZE, ground1_img)
+
+    all_sprites.add(ground1)
+    platforms.add(ground1)
+
+for x in range(0, WIDTH, TILE_SIZE):
+    ground = Platform(x, HEIGHT - TILE_SIZE, ground1_img)
+
+    all_sprites.add(ground1)
+    platforms.add(ground1)
+
+platform_positions = [
+    (200, 450, platform_img),
+    (242, 450, platform_img),
+    (284, 450, platform_img),
+
+    (400, 350, platform_img),
+    (442, 350, platform_img),
+    (484, 350, platform_img),
+
+
+    (150, 250, platform_img),
+    (192, 250, platform_img),
+
+    (250, 150, platform_img),
+    (291, 150, platform_img),
+    (332, 150, platform_img),
+
+]
+
+
+for pos in platform_positions:
+    platform = Platform(pos[0], pos[1], platform_img)
+    all_sprites.add(platform)
+    platforms.add(platform)
+
+
 running = True
 while running:
     clock.tick(FPS)
@@ -113,6 +198,17 @@ while running:
             running = False
     all_sprites.update()
 
+    collected_coins = pygame.sprite.spritecollide(player, coins, True)
+    for coin in  collected_coins:
+        score += coin.price
+
+
     screen.fill(white)
     all_sprites.draw(screen)
+    timer += 1
+    score_text = font.render(f'Coins: {score}', True, black)
+    time_text = font.render(f'Time: {timer}', True, black)
+    screen.blit(score_text, (20, 20))
+    screen.blit(time_text, (500, 20))
     pygame.display.flip()
+
