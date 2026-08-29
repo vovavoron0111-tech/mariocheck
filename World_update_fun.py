@@ -1,7 +1,7 @@
 from Player_sprites import Player, Platform, Coin, flip_image, Enemy
-from Backdrop_sprites import BackgroundSprite, Cloud, Hill, world_sprites, background_sprites
+from Backdrop_sprites import BackgroundSprite, Cloud, Hill
 from Level1 import get_coin_plan, get_platform_plan, get_enemy_plan
-def move_world(camera_dx):
+def move_world(camera_dx, world_sprites, background_sprites):
     for sprite in world_sprites:
         sprite.rect.x -= camera_dx
 
