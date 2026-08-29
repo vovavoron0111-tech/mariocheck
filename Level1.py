@@ -1,6 +1,9 @@
 import pygame
 
-from Oldthings.game import HEIGHT
+
+
+HEIGHT = 600
+
 
 TILE_SIZE = 41
 platform_img = pygame.image.load('Tiles/platform.png').convert_alpha()
