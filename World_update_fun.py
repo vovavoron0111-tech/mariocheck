@@ -1,6 +1,6 @@
-from Player_sprites import *
-from Backdrop_sprites import *
-from Level1 import *
+from Player_sprites import Player, Platform, Coin, flip_image, Enemy
+from Backdrop_sprites import BackgroundSprite, Cloud, Hill, world_sprites, background_sprites
+from Level1 import get_coin_plan, get_platform_plan, get_enemy_plan
 def move_world(camera_dx):
     for sprite in world_sprites:
         sprite.rect.x -= camera_dx
@@ -83,7 +83,7 @@ def create_platform(
 
     return created_platforms
 def spawn_platforms(
-    get_platform_plan,
+    platform_plan,
     world_offset,
     WIDTH,
     spawn_distance,
@@ -93,7 +93,7 @@ def spawn_platforms(
     world_sprites,
     platforms,
 ):
-    for platform_data in get_platform_plan():
+    for platform_data in platform_plan:
         if not platform_data["spawned"]:
             if platform_data["x_start"] < world_offset + WIDTH + spawn_distance:
                 create_platform(
@@ -139,7 +139,7 @@ def spawn_coins(
     world_sprites,
     coins
 ):
-    for coin_data in get_coin_plan():
+    for coin_data in coin_plan:
         if not coin_data["spawned"]:
             if coin_data["x_start"] < world_offset + WIDTH + spawn_distance:
                 create_coin(
@@ -181,7 +181,7 @@ def spawn_enemies(
         world_sprites,
         enemies,
 ):
-    for enemy_data in enemy_plan:
+    for enemy_data in get_enemy_plan():
         if not enemy_data["spawned"]:
             if enemy_data["x"] < world_offset + WIDTH + spawn_distance:
                 create_enemies(
