@@ -1,11 +1,17 @@
 import pygame
 import random
-from Player_sprites import *
-from Backdrop_sprites import *
-from Level1 import *
-from World_update_fun import *
+from Player_sprites import Player, Platform, Coin, flip_image, Enemy
+from Backdrop_sprites import BackgroundSprite, Cloud, Hill
+from Level1 import get_coin_plan, get_platform_plan, get_enemy_plan
+from World_update_fun import (
+    move_world,
+    ensure_ground,
+    spawn_platforms,
+    spawn_coins,
+    spawn_enemies
+)
 
-
+game_over = False
 score = 0
 timer = 0
 WIDTH = 800
@@ -78,26 +84,20 @@ jump_img2 = pygame.transform.scale(jump_img2, (40, 50))
 
 
 
-sky1 = BackgroundSprite(0, 0, WIDTH, HEIGHT,  0.05, sky_blue)
-sky2 = BackgroundSprite(WIDTH, 0, WIDTH, HEIGHT,  0.05, sky_blue)
-hill1 = Hill(0, 360, 0.25)
-hill2 = Hill(500, 370, 0.25)
-hill3 = Hill(1000, 350, 0.25)
-cloud1 = Cloud(100, 80, 0.4)
-cloud2 = Cloud(450, 140, 0.4)
-cloud3 = Cloud(850, 90, 0.4)
+sky1 = BackgroundSprite(0, 0, WIDTH, HEIGHT, sky_blue, 0.05, WIDTH)
+sky2 = BackgroundSprite(WIDTH, 0, WIDTH, HEIGHT, sky_blue, 0.05,WIDTH)
+hill1 = Hill(0, 360, 0.25, green, dark_green, WIDTH)
+hill2 = Hill(500, 370, 0.25, green, dark_green, WIDTH)
+hill3 = Hill(1000, 350, 0.25, green, dark_green, WIDTH)
+cloud1 = Cloud(100, 80, 0.4, white, WIDTH)
+cloud2 = Cloud(450, 140, 0.4, white, WIDTH)
+cloud3 = Cloud(850, 90, 0.4, white, WIDTH)
 
-player = Player(
-    player_idle_right,
-    player_idle_left,
-    player_walk_right,
-    player_walk_left,
-    player_jump_right,
-    player_jump_left,
-)
+
+
 platform_plan = get_platform_plan(platform_img)
 coin_plan = get_coin_plan(coin_images_original)
-enemy_plan = get_enemy_plan(HEIGHT, TILE_SIZE)
+enemy_plan = get_enemy_plan()
 
 
 
@@ -108,9 +108,43 @@ coins = pygame.sprite.Group()
 background_sprites = pygame.sprite.Group()
 world_sprites = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
+player_idle_right = player_img
+
+player_jump_right = [
+    jump_img,
+    jump_img1,
+    jump_img2,
+]
+
+player_walk_right = [
+    startrun_img,
+    startrun1_img,
+    run_img,
+    run1_img,
+    endrun_img,
+]
+
+player_idle_left = flip_image(player_idle_right)
+
+player_jump_left = []
+
+for image in player_jump_right:
+    player_jump_left.append(flip_image(image))
+
+player_walk_left = []
+
+for image in player_walk_right:
+    player_walk_left.append(flip_image(image))
+player = Player(
+    player_idle_right,
+    player_idle_left,
+    player_walk_right,
+    player_walk_left,
+    player_jump_right,
+    player_jump_left,
+)
 
 
-all_sprites.add(player)
 all_sprites.add(platforms)
 background_sprites.add(
     sky1,
@@ -138,7 +172,7 @@ next_ground_x = ensure_ground(
 )
 
 spawn_platforms(
-    get_platform_plan,
+    platform_plan,
     world_offset,
     WIDTH,
     spawn_distance,
@@ -149,7 +183,7 @@ spawn_platforms(
     platforms,
 )
 spawn_coins(
-    get_coin_plan,
+    coin_plan,
     world_offset,
     WIDTH,
     spawn_distance,
@@ -170,6 +204,7 @@ spawn_enemies(
     world_sprites,
     enemies,
 )
+
 running = True
 while running:
     clock.tick(FPS)
@@ -177,7 +212,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     all_sprites.update()
-
+    player.update(platforms, WIDTH, gravity)
     #-----#
     if player.rect.centerx > camera_border_x:
         camera_dx = player.rect.centerx - camera_border_x
@@ -198,47 +233,11 @@ while running:
         world_sprites,
         platforms,
     )
-    spawn_platforms(
-        get_platform_plan,
-        world_offset,
-        WIDTH,
-        spawn_distance,
-        TILE_SIZE,
-        Platform,
-        all_sprites,
-        world_sprites,
-        platforms,
-    )
-    spawn_coins(
-        get_coin_plan,
-        world_offset,
-        WIDTH,
-        spawn_distance,
-        Coin,
-        all_sprites,
-        world_sprites,
-        coins
-    )
-    spawn_enemies(
-        enemy_plan,
-        world_offset,
-        WIDTH,
-        enemy_spawn_distance,
-        gravity,
-        Enemy,
-        platforms,
-        all_sprites,
-        world_sprites,
-        enemies,
-    )
-
-
-
     collected_coins = pygame.sprite.spritecollide(player, coins, True)
     for coin in  collected_coins:
         score += coin.price
 
-    if pygame.sprite.spritecollide(player, enemies):
+    if pygame.sprite.spritecollide(player, enemies, True):
         game_over = True
 
 
