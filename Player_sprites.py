@@ -102,6 +102,7 @@ class Player(pygame.sprite.Sprite):
             walk_left,
             jump_right,
             jump_left,
+
             ):
         super().__init__()
         self.on_ground = True
