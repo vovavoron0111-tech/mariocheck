@@ -265,7 +265,7 @@ class Enemy(pygame.sprite.Sprite):
         self.frames_per_image = 12
         self.image = self.images[self.current_frame]
         self.rect = self.image.get_rect()
-        self.rect_midbottom = (x, bottom_y)
+        self.rect.midbottom = (x, bottom_y)
     @staticmethod
     def create_image(left_foot_up = False):
         image = pygame.Surface ((40, 34), pygame.SRCALPHA)
@@ -292,7 +292,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.current_frame = 0
             self.image = self.images[self.current_frame]
             self.rect = self.image.get_rect()
-            self.rect_midbottom = old_midbottom
+            self.rect.midbottom = old_midbottom
     def update(self):
         self.rect.x -= self.speed
         old_rect_y = self.rect.copy()
