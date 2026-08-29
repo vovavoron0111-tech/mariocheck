@@ -130,7 +130,7 @@ def get_enemy_plan():
     ground_top_y = HEIGHT - TILE_SIZE * 3
     return [
     {
-        "x": 720,
+        "x": 1720,
         "bottom_y": ground_top_y,
         "speed": 1.4,
         "spawned": False,
