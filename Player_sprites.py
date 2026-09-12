@@ -256,9 +256,18 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = abs(speed)
         self.gravity = gravity
         self.speed_y = 0
+        self.direction = "left"
         self.images = [
-            self.create_image(left_foot_up= False),
-            self.create_image(left_foot_up= True),
+            self.create_image(1),
+            self.create_image(2),
+            self.create_image(3),
+            self.create_image(4),
+        ]
+        self.right_images = [
+            flip_image(self.create_image(1)),
+            flip_image(self.create_image(2)),
+            flip_image(self.create_image(3)),
+            flip_image(self.create_image(4)),
         ]
         self.current_frame = 0
         self.frame_timer = 0
@@ -267,7 +276,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.midbottom = (x, bottom_y)
     @staticmethod
-    def create_image(left_foot_up = False):
+    def create_image(left_foot_up):
         image = pygame.Surface ((40, 34), pygame.SRCALPHA)
         pygame.draw.ellipse(image, (180,70,35), [3, 3, 34, 27])
         pygame.draw.ellipse(image, (225, 105, 45), [7, 1, 26, 18])
@@ -275,9 +284,15 @@ class Enemy(pygame.sprite.Sprite):
         pygame.draw.circle(image, (255, 255, 255), (25, 13), 4)
         pygame.draw.circle(image, (20, 20, 20), (14, 14), 2)
         pygame.draw.circle(image, (20, 20, 20), (24, 14), 2)
-        if left_foot_up:
+        if  left_foot_up == 1:
             pygame.draw.ellipse(image, (70, 35, 20), [3, 27, 15, 6])
             pygame.draw.ellipse(image, (70, 35, 20), [23, 25, 15, 8])
+        elif left_foot_up == 2:
+            pygame.draw.ellipse(image, (70, 35, 20), [3, 26.5, 15, 7])
+            pygame.draw.ellipse(image, (70, 35, 20), [23, 25.5, 15, 7])
+        elif left_foot_up == 3:
+            pygame.draw.ellipse(image, (70, 35, 20), [3, 25.5, 15, 7])
+            pygame.draw.ellipse(image, (70, 35, 20), [23, 26.5, 15, 7])
         else:
             pygame.draw.ellipse(image, (70, 35, 20), [3, 25, 15, 8])
             pygame.draw.ellipse(image, (70, 35, 20), [23, 27, 15, 6])
@@ -290,12 +305,16 @@ class Enemy(pygame.sprite.Sprite):
             self.current_frame += 1
             if self.current_frame >= len(self.images):
                 self.current_frame = 0
-            self.image = self.images[self.current_frame]
+            if self.direction == "left":
+                self.image = self.images[self.current_frame]
+            else:
+                self.image = self.right_images[self.current_frame]
             self.rect = self.image.get_rect()
             self.rect.midbottom = old_midbottom
     def update(self):
         self.rect.x -= self.speed
         old_rect_y = self.rect.copy()
+        old_rect_x = self.rect.copy()
         self.speed_y += self.gravity
         if self.speed_y > 10:
             self.speed_y = 10
@@ -306,6 +325,21 @@ class Enemy(pygame.sprite.Sprite):
                 self.rect.bottom = platform.rect.top
                 self.speed_y = 0
                 break
+        hits_x = pygame.sprite.spritecollide(self, platforms, False)
+
+        for platform in hits_x:
+            if self.speed < 0 and old_rect_x.right <= platform.rect.left:
+                self.rect.right = platform.rect.left
+                self.direction = "left"
+                self.speed = -self.speed
+
+            elif self.speed > 0 and old_rect_x.left >= platform.rect.right:
+                self.rect.left = platform.rect.right
+                self.direction = "right"
+                self.speed = -self.speed
+
+
+
         self.animate()
         if self.rect.right < -200 or self.rect.top > 800:
             self.kill()
