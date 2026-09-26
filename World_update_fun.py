@@ -181,7 +181,7 @@ def spawn_enemies(
         world_sprites,
         enemies,
 ):
-    for enemy_data in get_enemy_plan():
+    for enemy_data in enemie_plan:
         if not enemy_data["spawned"]:
             if enemy_data["x"] < world_offset + WIDTH + spawn_distance:
                 create_enemies(
