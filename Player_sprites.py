@@ -406,6 +406,44 @@ player = Player(
     player_jump_left,
 )
 
+class MenuWalker:
+    def _init_(self, image_index, x, y, speed, left_limit, right_limit):
+        if image_index == 1:
+            self.image = player_walk_right
+        elif image_index == 2:
+            self.image = player_walk_left
+        self.image_index = 1
+        self.image = self.images [0]
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.speed = speed
+        self.left_limit = left_limit
+        self.right_limit = right_limit
+        self.direction = 1
+        self.frame_timer = 0
+        self. frames_per_image = 10
+
+    def update(self):
+        # двигаемся
+        self.rect.x += self.speed * self.direction
+        # дошли до правой границы
+        if self.rect.right >= self.right_limit:
+            self.direction = -1
+        # дошли до левой границы
+        elif self.rect.left <= self.left_limit:
+            self.direction = 1
+        # анимация
+        self.frame_timer += 1
+        if self.frame_timer >= self.frames_per_image:
+
+            self.frame_timer = 0
+            self.image_index += 1
+            if self.image_index >= len(self.images):
+                self.image_index = 0
+            self.image = self.images[self.image_index]
+
 platforms = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 coins = pygame.sprite.Group()
+
+menu_player = MenuWalker(1, 2, 3, 4, 5, 6)
