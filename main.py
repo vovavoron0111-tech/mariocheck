@@ -1,6 +1,6 @@
 import pygame
 import random
-from Player_sprites import Player, Platform, Coin, flip_image, Enemy
+from Player_sprites import Player, Platform, Coin, flip_image, Enemy, menu_player
 from Backdrop_sprites import BackgroundSprite, Cloud, Hill
 from Level1 import get_coin_plan, get_platform_plan, get_enemy_plan
 from World_update_fun import (
@@ -51,7 +51,12 @@ ground_y = HEIGHT -50
 TILE_SIZE = 41
 gravity = 0.3
 
+game_state = "Menu"
 
+start_button_img = pygame.image.load('Tiles/3start.png').convert_alpha()
+exit_button_img = pygame.image.load('Tiles/1exit.png').convert_alpha()
+rules_button_img = pygame.image.load('Tiles/2rules.png').convert_alpha()
+menu_img = pygame.image.load('Tiles/MARIO.png').convert_alpha()
 ground_img = pygame.image.load('Tiles/ground.png').convert_alpha()
 platform_img = pygame.image.load('Tiles/platform.png').convert_alpha()
 player_img = pygame.image.load('Tiles/player.png').convert_alpha()
@@ -66,6 +71,10 @@ jump_img = pygame.image.load('Tiles/jump.png').convert_alpha()
 jump_img1 = pygame.image.load('Tiles/jump1.png').convert_alpha()
 jump_img2 = pygame.image.load('Tiles/jump2.png').convert_alpha()
 
+start_button_img = pygame.transform.scale(start_button_img, (100, 80))
+exit_button_img = pygame.transform.scale(exit_button_img, (100, 80))
+rules_button_img = pygame.transform.scale(rules_button_img, (100, 80))
+menu_img = pygame.transform.scale(menu_img, (800, 600))
 ground_img = pygame.transform.scale(ground_img, (TILE_SIZE, TILE_SIZE))
 platform_img = pygame.transform.scale(platform_img, (TILE_SIZE, TILE_SIZE/2))
 player_img = pygame.transform.scale(player_img, (40, 50))
@@ -214,8 +223,18 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    if game_state == "Menu":
+        screen.blit(menu_img, (0, 0))
+        screen.blit(start_button_img, (450, 375))
+        screen.blit(exit_button_img, (540, 340))
+        screen.blit(rules_button_img, (630, 305))
+        menu_player.update()
 
-    if not game_over:
+
+
+
+
+    if game_state == "game":
         platforms.update()
         coins.update()
         background_sprites.update()
@@ -252,16 +271,16 @@ while running:
 
 
         timer += 1
-    screen.fill(white)
-    background_sprites.draw(screen)
-    all_sprites.draw(screen)
-    score_text = font.render(f'Coins: {score}', True, black)
-    time_text = font.render(f'Time: {timer}', True, black)
-    distance_text = font.render(f'Distance: {int(world_offset)}', True, black)
+        screen.fill(white)
+        background_sprites.draw(screen)
+        all_sprites.draw(screen)
+        score_text = font.render(f'Coins: {score}', True, black)
+        time_text = font.render(f'Time: {timer}', True, black)
+        distance_text = font.render(f'Distance: {int(world_offset)}', True, black)
 
-    screen.blit(score_text, (20, 20))
-    screen.blit(time_text, (500, 20))
-    screen.blit(distance_text, (20, 60))
+        screen.blit(score_text, (20, 20))
+        screen.blit(time_text, (500, 20))
+        screen.blit(distance_text, (20, 60))
 
 
     if game_over:
