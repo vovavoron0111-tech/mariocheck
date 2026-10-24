@@ -130,8 +130,8 @@ def get_enemy_plan():
     ground_top_y = HEIGHT - TILE_SIZE * 3
     return [
     {
-        "x": 1720,
-        "bottom_y": ground_top_y,
+        "x": 1750,
+        "bottom_y": 400,
         "speed": 1.4,
         "spawned": False,
     },
@@ -141,4 +141,28 @@ def get_enemy_plan():
         "speed": 1.2,
         "spawned": False,
     },
+    {
+        "x": 2950,
+        "bottom_y": 430,
+        "speed": 2,
+        "spawned": False,
+    },
+    {
+        "x": 3450,
+        "bottom_y": 430,
+        "speed": 1,
+        "spawned": False,
+    },
+    {
+        "x": 4000,
+        "bottom_y": 430,
+        "speed": 3,
+        "spawned": False,
+    },
+    {
+        "x": 4550,
+        "bottom_y": 430,
+        "speed": 1.2,
+        "spawned": False,
+        },
     ]
