@@ -1,6 +1,6 @@
 import pygame
 import random
-from Player_sprites import Player, Platform, Coin, flip_image, Enemy, menu_player
+from Player_sprites import Player, Platform, Coin, flip_image, Enemy, MenuWalker
 from Backdrop_sprites import BackgroundSprite, Cloud, Hill
 from Level1 import get_coin_plan, get_platform_plan, get_enemy_plan
 from World_update_fun import (
@@ -89,7 +89,8 @@ jump_img = pygame.transform.scale(jump_img, (40, 40))
 jump_img1 = pygame.transform.scale(jump_img1, (40, 50))
 jump_img2 = pygame.transform.scale(jump_img2, (40, 50))
 
-
+menu_player = MenuWalker(2, 600, 200, 2, 0, 800)
+menu_enemy = MenuWalker(4, 4, 5, 2, 0, 800)
 
 
 
@@ -153,7 +154,8 @@ player = Player(
     player_jump_left,
 )
 
-
+menu_sprites = pygame.sprite.Group()
+menu_sprites.add(menu_player, menu_enemy)
 all_sprites.add(platforms)
 all_sprites.add(player)
 background_sprites.add(
@@ -224,12 +226,13 @@ while running:
             running = False
 
     if game_state == "Menu":
+        menu_sprites.update()
+
         screen.blit(menu_img, (0, 0))
+        menu_sprites.draw(screen)
         screen.blit(start_button_img, (450, 375))
         screen.blit(exit_button_img, (540, 340))
         screen.blit(rules_button_img, (630, 305))
-        menu_player.update()
-
 
 
 
