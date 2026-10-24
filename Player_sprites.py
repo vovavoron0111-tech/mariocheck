@@ -1,5 +1,9 @@
+from logging import currentframe
+
 import pygame
 import random
+
+from main import menu_player
 
 score = 0
 timer = 0
@@ -406,22 +410,68 @@ player = Player(
     player_jump_left,
 )
 
-class MenuWalker:
-    def _init_(self, image_index, x, y, speed, left_limit, right_limit):
+class MenuWalker(pygame.sprite.Sprite):
+    def __init__(self, image_index, x, y, speed, left_limit, right_limit):
+        super().__init__()
+        self.on_ground = False
+        self.speed_y = 0
+        self.current_frame = 0
         if image_index == 1:
-            self.image = player_walk_right
+            self.images = player_walk_right
+            self.direction = 1
+            self.speed = - speed
         elif image_index == 2:
-            self.image = player_walk_left
-        self.image_index = 1
-        self.image = self.images [0]
+            self.images = player_walk_left
+            self.direction = -1
+            self.speed = speed
+        elif image_index == 3:
+            self.images = [
+                self.create_image(1),
+                self.create_image(2),
+                self.create_image(3),
+                self.create_image(4),
+            ]
+            self.direction = 1
+            self.speed = - speed
+        elif image_index == 4:
+            self.images = [
+                flip_image(self.create_image(1)),
+                flip_image(self.create_image(2)),
+                flip_image(self.create_image(3)),
+                flip_image(self.create_image(4)),
+            ]
+            self.direction = -1
+            self.speed = speed
+        self.image_index = 0
+        self.image = self.images[self.image_index]
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
-        self.speed = speed
         self.left_limit = left_limit
         self.right_limit = right_limit
-        self.direction = 1
         self.frame_timer = 0
         self. frames_per_image = 10
+    @staticmethod
+    def create_image(left_foot_up):
+        image = pygame.Surface ((40, 34), pygame.SRCALPHA)
+        pygame.draw.ellipse(image, (180,70,35), [3, 3, 34, 27])
+        pygame.draw.ellipse(image, (225, 105, 45), [7, 1, 26, 18])
+        pygame.draw.circle(image, (255, 255, 255), (15, 13), 4)
+        pygame.draw.circle(image, (255, 255, 255), (25, 13), 4)
+        pygame.draw.circle(image, (20, 20, 20), (14, 14), 2)
+        pygame.draw.circle(image, (20, 20, 20), (24, 14), 2)
+        if  left_foot_up == 1:
+            pygame.draw.ellipse(image, (70, 35, 20), [3, 27, 15, 6])
+            pygame.draw.ellipse(image, (70, 35, 20), [23, 25, 15, 8])
+        elif left_foot_up == 2:
+            pygame.draw.ellipse(image, (70, 35, 20), [3, 26.5, 15, 7])
+            pygame.draw.ellipse(image, (70, 35, 20), [23, 25.5, 15, 7])
+        elif left_foot_up == 3:
+            pygame.draw.ellipse(image, (70, 35, 20), [3, 25.5, 15, 7])
+            pygame.draw.ellipse(image, (70, 35, 20), [23, 26.5, 15, 7])
+        else:
+            pygame.draw.ellipse(image, (70, 35, 20), [3, 25, 15, 8])
+            pygame.draw.ellipse(image, (70, 35, 20), [23, 27, 15, 6])
+        return image
 
     def update(self):
         # двигаемся
@@ -432,6 +482,9 @@ class MenuWalker:
         # дошли до левой границы
         elif self.rect.left <= self.left_limit:
             self.direction = 1
+        if self.on_ground:
+            self.speed_y = -10
+            self.on_ground = False
         # анимация
         self.frame_timer += 1
         if self.frame_timer >= self.frames_per_image:
@@ -442,8 +495,45 @@ class MenuWalker:
                 self.image_index = 0
             self.image = self.images[self.image_index]
 
+        #--------------------Y-------------#
+        if menu_player:
+            old_rect_y = self.rect.copy()
+
+            self.speed_y += gravity
+
+            if self.speed_y > 10:
+                self.speed_y = 10
+
+            self.rect.y += self.speed_y
+
+            self.on_ground = False
+
+            hits_y = pygame.sprite.spritecollide(self, platforms, False)
+
+            for platform in hits_y:
+                if self.speed_y > 0 and old_rect_y.bottom <= platform.rect.top:
+                    self.rect.bottom = platform.rect.top
+                    self.speed_y = 0
+                    self.on_ground = True
+
+                elif self.speed_y < 0 and old_rect_y.top >= platform.rect.bottom:
+                    self.rect.top = platform.rect.bottom
+                    self.speed_y = 0
+    def animate(self):
+        old_midbottom = self.rect.midbottom
+        self.frame_timer += 1
+        if self.frame_timer >= self.frames_per_image:
+            self.frame_timer = 0
+            self.current_frame += 1
+            if self.current_frame >= len(self.images):
+                self.current_frame = 0
+            if self.direction == "left":
+                self.image = self.images[self.current_frame]
+            else:
+                self.image = self.right_images[self.current_frame]
+            self.rect = self.image.get_rect()
+            self.rect.midbottom = old_midbottom
 platforms = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 coins = pygame.sprite.Group()
 
-menu_player = MenuWalker(1, 2, 3, 4, 5, 6)
