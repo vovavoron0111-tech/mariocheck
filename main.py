@@ -1,6 +1,6 @@
 import pygame
 import random
-from Player_sprites import Player, Platform, Coin, flip_image, Enemy, MenuWalker
+from Player_sprites import hero, Platform, Coin, flip_image, Enemy, menu_player, menu_enemy
 from Backdrop_sprites import BackgroundSprite, Cloud, Hill
 from Level1 import get_coin_plan, get_platform_plan, get_enemy_plan
 from World_update_fun import (
@@ -89,8 +89,8 @@ jump_img = pygame.transform.scale(jump_img, (40, 40))
 jump_img1 = pygame.transform.scale(jump_img1, (40, 50))
 jump_img2 = pygame.transform.scale(jump_img2, (40, 50))
 
-menu_player = MenuWalker(2, 600, 200, 2, 0, 800)
-menu_enemy = MenuWalker(4, 4, 5, 2, 0, 800)
+
+
 
 
 
@@ -145,19 +145,12 @@ player_walk_left = []
 
 for image in player_walk_right:
     player_walk_left.append(flip_image(image))
-player = Player(
-    player_idle_right,
-    player_idle_left,
-    player_walk_right,
-    player_walk_left,
-    player_jump_right,
-    player_jump_left,
-)
+
 
 menu_sprites = pygame.sprite.Group()
 menu_sprites.add(menu_player, menu_enemy)
 all_sprites.add(platforms)
-all_sprites.add(player)
+all_sprites.add(hero)
 background_sprites.add(
     sky1,
     sky2,
@@ -237,18 +230,19 @@ while running:
 
 
 
+
     if game_state == "game":
         platforms.update()
         coins.update()
         background_sprites.update()
         world_sprites.update()
         enemies.update()
-        player.update(platforms, WIDTH, gravity)
+        hero.update(platforms, WIDTH, gravity)
 
     #-----#
-        if player.rect.centerx > camera_border_x:
-            camera_dx = player.rect.centerx - camera_border_x
-            player.rect.centerx = camera_border_x
+        if hero.rect.centerx > camera_border_x:
+            camera_dx = hero.rect.centerx - camera_border_x
+            hero.rect.centerx = camera_border_x
             world_offset += camera_dx
             move_world(camera_dx, world_sprites, background_sprites)
         spawn_all()
@@ -265,11 +259,11 @@ while running:
             world_sprites,
             platforms,
         )
-        collected_coins = pygame.sprite.spritecollide(player, coins, True)
+        collected_coins = pygame.sprite.spritecollide(hero, coins, True)
         for coin in  collected_coins:
             score += coin.price
 
-        if pygame.sprite.spritecollide(player, enemies, True):
+        if pygame.sprite.spritecollide(hero, enemies, True):
             game_over = True
 
 
