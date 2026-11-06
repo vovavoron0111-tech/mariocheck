@@ -3,7 +3,6 @@ from logging import currentframe
 import pygame
 import random
 
-from main import menu_player
 
 score = 0
 timer = 0
@@ -401,7 +400,7 @@ class Coin(pygame.sprite.Sprite):
         if self.rect.right < -200:
             self.kill()
 
-player = Player(
+hero = Player(
     player_idle_right,
     player_idle_left,
     player_walk_right,
@@ -536,4 +535,5 @@ class MenuWalker(pygame.sprite.Sprite):
 platforms = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 coins = pygame.sprite.Group()
-
+menu_enemy = MenuWalker(4, 4, 5, 2, 0, 800)
+menu_player = MenuWalker(2, 600, 200, 2, 0, 800)
