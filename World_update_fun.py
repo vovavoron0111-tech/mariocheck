@@ -1,6 +1,7 @@
 from Player_sprites import Player, Platform, Coin, flip_image, Enemy
 from Backdrop_sprites import BackgroundSprite, Cloud, Hill
 from Level1 import get_coin_plan, get_platform_plan, get_enemy_plan
+from menu import get_menu_platform_plan
 def move_world(camera_dx, world_sprites, background_sprites):
     for sprite in world_sprites:
         sprite.rect.x -= camera_dx
@@ -197,3 +198,73 @@ def spawn_enemies(
                     enemies,
                 )
                 enemy_data["spawned"] = True
+def create_menu_platforms(
+        count,
+        images,
+        y_start,
+        x_start,
+        world_offset,
+        TILE_SIZE,
+        PlatformClass,
+        menu_sprites,
+):
+    created_menu_platforms = []
+
+    for i in range(count):
+        image = images[i % len(images)]
+        screen_x = x_start + i * TILE_SIZE - world_offset
+
+
+
+        menu_platform = PlatformClass(screen_x, y_start, image)
+
+        created_menu_platforms.append(menu_platform)
+    return created_menu_platforms
+def spawn_menu_platforms(
+    platform_plan,
+    world_offset,
+    WIDTH,
+    spawn_distance,
+    TILE_SIZE,
+    PlatformClass,
+    menu_sprites,
+):
+    for platform_data in platform_plan:
+        if not platform_data["spawned"]:
+            if platform_data["x_start"] < world_offset + WIDTH + spawn_distance:
+                create_menu_platforms(
+                    platform_data["count"],
+                    platform_data["images"],
+                    platform_data["y_start"],
+                    platform_data["x_start"],
+                    world_offset,
+                    TILE_SIZE,
+                    PlatformClass,
+                    menu_sprites,
+                    [],
+                    [],
+                )
+                platform_data["spawned"] = True
+
+            '''platform_plan,
+        world_offset,
+        WIDTH,
+        spawn_distance,
+        TILE_SIZE,
+        Platform,
+        all_sprites,
+        world_sprites,
+        platforms,
+        
+         create_platform(
+                    platform_data["count"],
+                    platform_data["images"],
+                    platform_data["y_start"],
+                    platform_data["x_start"],
+                    world_offset,
+                    TILE_SIZE,
+                    PlatformClass,
+                    all_sprites,
+                    world_sprites,
+                    platforms,
+            '''
