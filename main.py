@@ -8,7 +8,8 @@ from World_update_fun import (
     ensure_ground,
     spawn_platforms,
     spawn_coins,
-    spawn_enemies
+    spawn_enemies,
+    spawn_menu_platforms
 )
 
 game_over = False
@@ -209,7 +210,15 @@ def spawn_all():
         world_sprites,
         enemies,
     )
-
+    spawn_menu_platforms(
+        platform_plan,
+        world_offset,
+        WIDTH,
+        spawn_distance,
+        TILE_SIZE,
+        Platform,
+        menu_sprites,
+        )
 spawn_all()
 running = True
 while running:
