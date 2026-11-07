@@ -8,7 +8,7 @@ HEIGHT = 600
 TILE_SIZE = 41
 platform_img = pygame.image.load('Tiles/platform.png').convert_alpha()
 platform_img = pygame.transform.scale(platform_img, (TILE_SIZE, TILE_SIZE/2))
-def get_platform_plan(platform_img):
+def get_menu_platform_plan(platform_img):
     return [
     {
         "x_start": 200,
