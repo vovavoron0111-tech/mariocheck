@@ -11,7 +11,7 @@ from World_update_fun import (
     spawn_enemies,
     spawn_menu_platforms
 )
-
+from menu import get_menu_platform_plan
 game_over = False
 score = 0
 timer = 0
@@ -152,6 +152,7 @@ menu_sprites = pygame.sprite.Group()
 menu_sprites.add(menu_player, menu_enemy)
 all_sprites.add(platforms)
 all_sprites.add(hero)
+
 background_sprites.add(
     sky1,
     sky2,
@@ -176,6 +177,7 @@ next_ground_x = ensure_ground(
     world_sprites,
     platforms,
 )
+menu_platforms = pygame.sprite.Group()
 def spawn_all():
     spawn_platforms(
         platform_plan,
@@ -210,16 +212,20 @@ def spawn_all():
         world_sprites,
         enemies,
     )
-    spawn_menu_platforms(
-        platform_plan,
-        world_offset,
+
+spawn_all()
+menu_plan = get_menu_platform_plan(platform_img)
+spawn_menu_platforms(
+        menu_plan,
+        0,
         WIDTH,
         spawn_distance,
         TILE_SIZE,
         Platform,
-        menu_sprites,
+        menu_platforms
         )
-spawn_all()
+menu_player.platforms = menu_platforms
+menu_enemy.platforms = menu_platforms
 running = True
 while running:
     clock.tick(FPS)
@@ -232,6 +238,7 @@ while running:
 
         screen.blit(menu_img, (0, 0))
         menu_sprites.draw(screen)
+        menu_platforms.draw(screen)
         screen.blit(start_button_img, (450, 375))
         screen.blit(exit_button_img, (540, 340))
         screen.blit(rules_button_img, (630, 305))
@@ -255,7 +262,7 @@ while running:
             world_offset += camera_dx
             move_world(camera_dx, world_sprites, background_sprites)
         spawn_all()
-        next_ground_x = ensure_ground(
+        next_ground_x = ensure_f(
             next_ground_x,
             world_offset,
             WIDTH,
