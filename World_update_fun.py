@@ -218,8 +218,7 @@ def create_menu_platforms(
 
         menu_platform = PlatformClass(screen_x, y_start, image)
 
-        created_menu_platforms.append(menu_platform)
-    return created_menu_platforms
+        menu_sprites.add(menu_platform)
 def spawn_menu_platforms(
     platform_plan,
     world_offset,
@@ -241,8 +240,6 @@ def spawn_menu_platforms(
                     TILE_SIZE,
                     PlatformClass,
                     menu_sprites,
-                    [],
-                    [],
                 )
                 platform_data["spawned"] = True
 
