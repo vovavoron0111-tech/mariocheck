@@ -278,6 +278,7 @@ class Enemy(pygame.sprite.Sprite):
         self.image = self.images[self.current_frame]
         self.rect = self.image.get_rect()
         self.rect.midbottom = (x, bottom_y)
+
     @staticmethod
     def create_image(left_foot_up):
         image = pygame.Surface ((40, 34), pygame.SRCALPHA)
@@ -449,6 +450,7 @@ class MenuWalker(pygame.sprite.Sprite):
         self.right_limit = right_limit
         self.frame_timer = 0
         self. frames_per_image = 10
+        self.platforms = pygame.sprite.Group()
     @staticmethod
     def create_image(left_foot_up):
         image = pygame.Surface ((40, 34), pygame.SRCALPHA)
@@ -507,7 +509,7 @@ class MenuWalker(pygame.sprite.Sprite):
 
             self.on_ground = False
 
-            hits_y = pygame.sprite.spritecollide(self, platforms, False)
+            hits_y = pygame.sprite.spritecollide(self, self.platforms, False)
 
             for platform in hits_y:
                 if self.speed_y > 0 and old_rect_y.bottom <= platform.rect.top:
